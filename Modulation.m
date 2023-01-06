@@ -6,10 +6,14 @@ close all;
 [message_2, fs_2] = audioread('Input/audio_2.m4a');
 [message_3, fs_3] = audioread('Input/audio_3.m4a');
 
+% Set sample ratio
+global SAMPLE_RATIO;
+SAMPLE_RATIO = 3;
+
 % Select first channel for the three signals
-message_1 = message_1(:, 1);
-message_2 = message_2(:, 1);
-message_3 = message_3(:, 1);
+message_1 = resample(message_1(:, 1), SAMPLE_RATIO, 1);
+message_2 = resample(message_2(:, 1), SAMPLE_RATIO, 1);
+message_3 = resample(message_3(:, 1), SAMPLE_RATIO, 1);
 
 % Set Sampling Frequency (They are all the same)
 fs = fs_1;
@@ -28,8 +32,6 @@ message_2 = [message_2;zeros(max_N-N_2, 1)];
 message_3 = [message_3;zeros(max_N-N_3, 1)];
 
 % Time & Frequency interval
-global time;
-global freq;
 time = linspace(0, max_N/fs, max_N);
 df = fs/2;
 freq = -df : fs/max_N: df - fs/max_N;
@@ -173,14 +175,19 @@ function demodulate(signal, carrier, fs, fp, filename)
     % Low pass filter to get each message alone
     lpf = lowpass(demodulatedSignal, fp, fs);
     
+    % Resample the signal back to its original Fs
+    global SAMPLE_RATIO;
+    lpf = resample(lpf, 1, SAMPLE_RATIO);
+    
     % Get demodulated signal amplitude and phase in Frequency Domain
     lpf_f = fftshift(fft(lpf));
     phase_demod = unwrap(angle(lpf_f));
     
     % Plot the demodulated signal
-    global time;
-    global freq;
+    N = length(lpf);
     global j;
+    time = linspace(0, N/fs, N);
+    freq = -(fs/2) : fs/N: (fs/2) - fs/N;
     draw(time, freq.', j, lpf, abs(lpf_f), phase_demod, filename);
     j = j + 1;
     
