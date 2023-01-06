@@ -10,7 +10,7 @@ close all;
 global SAMPLE_RATIO;
 SAMPLE_RATIO = 3;
 
-% Select first channel for the three signals
+% Select first channel for the three signals & Up-sample
 message_1 = resample(message_1(:, 1), SAMPLE_RATIO, 1);
 message_2 = resample(message_2(:, 1), SAMPLE_RATIO, 1);
 message_3 = resample(message_3(:, 1), SAMPLE_RATIO, 1);
@@ -175,7 +175,7 @@ function demodulate(signal, carrier, fs, fp, filename)
     % Low pass filter to get each message alone
     lpf = lowpass(demodulatedSignal, fp, fs);
     
-    % Resample the signal back to its original Fs
+    % Down-sample the signal back to its original Fs
     global SAMPLE_RATIO;
     lpf = resample(lpf, 1, SAMPLE_RATIO);
     
