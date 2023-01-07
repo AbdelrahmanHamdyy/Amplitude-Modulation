@@ -7,13 +7,13 @@ close all;
 [message_3, fs_3] = audioread('Input/audio_3.m4a');
 
 % Set sample ratio
-global SAMPLE_RATIO;
-SAMPLE_RATIO = 3;
+global RESAMPLE_FACTOR;
+RESAMPLE_FACTOR = 3;
 
 % Select first channel for the three signals & Up-sample
-message_1 = resample(message_1(:, 1), SAMPLE_RATIO, 1);
-message_2 = resample(message_2(:, 1), SAMPLE_RATIO, 1);
-message_3 = resample(message_3(:, 1), SAMPLE_RATIO, 1);
+message_1 = resample(message_1(:, 1), RESAMPLE_FACTOR, 1);
+message_2 = resample(message_2(:, 1), RESAMPLE_FACTOR, 1);
+message_3 = resample(message_3(:, 1), RESAMPLE_FACTOR, 1);
 
 % Set Sampling Frequency (They are all the same)
 fs = fs_1;
@@ -31,7 +31,7 @@ message_1 = [message_1;zeros(max_N-N_1, 1)];
 message_2 = [message_2;zeros(max_N-N_2, 1)];
 message_3 = [message_3;zeros(max_N-N_3, 1)];
 
-% Time & Frequency interval
+% Time & Frequency intervals
 time = linspace(0, max_N/fs, max_N);
 df = fs/2;
 freq = -df : fs/max_N: df - fs/max_N;
@@ -176,8 +176,8 @@ function demodulate(signal, carrier, fs, fp, filename)
     lpf = lowpass(demodulatedSignal, fp, fs);
     
     % Down-sample the signal back to its original Fs
-    global SAMPLE_RATIO;
-    lpf = resample(lpf, 1, SAMPLE_RATIO);
+    global RESAMPLE_FACTOR;
+    lpf = resample(lpf, 1, RESAMPLE_FACTOR);
     
     % Get demodulated signal amplitude and phase in Frequency Domain
     lpf_f = fftshift(fft(lpf));
